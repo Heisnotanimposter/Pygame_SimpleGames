@@ -1,6 +1,3 @@
-# weapon.py
-
-import pygame
 
 # Weapon class
 class Weapon(pygame.sprite.Sprite):

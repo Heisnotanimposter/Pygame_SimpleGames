@@ -1,17 +1,10 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
-# dealer.py
 
 import pygame
 
-class Dealer(pygame.sprite.Sprite):
+class player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((50, 50))  # Placeholder image
+        self.image = pygame.image.load("player_sprite.png").convert_alpha() 
         self.image.fill(WHITE)
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH // 2, HEIGHT // 2)
@@ -28,7 +21,12 @@ class Dealer(pygame.sprite.Sprite):
         if keys[pygame.K_d]:
             self.rect.x += self.speed
 
-        # Keep the Dealer within the game boundaries
+        pressed_keys = pygame.key.get_pressed()  
+        # Get state of all keys
+        if pressed_keys[pygame.K_w]:
+            self.rect.y -= self.speed
+
+        # Keep the player within the game boundaries
         if self.rect.left < 0:
             self.rect.left = 0
         elif self.rect.right > WIDTH:
@@ -39,6 +37,6 @@ class Dealer(pygame.sprite.Sprite):
             self.rect.bottom = HEIGHT
 
     def draw(self, screen):
-        # Draw the Dealer on the screen
+        # Draw the player on the screen
         screen.blit(self.image, self.rect)
 
