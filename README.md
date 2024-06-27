@@ -1,2 +1,2 @@
-# PygameDealmeter
-Deal meter calibration
+# Pygame
+
