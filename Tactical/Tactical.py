@@ -10,13 +10,14 @@ FPS = 60
 # Pygame Initialization
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Tactical.io")
+pygame.display.set_caption("Decent.io: Tactical Domination")
 clock = pygame.time.Clock()
 
 # Load Assets (Replace with your own assets)
 grass_tile = pygame.image.load("assets/grass.png").convert_alpha()
 water_tile = pygame.image.load("assets/water.png").convert_alpha()
 mountain_tile = pygame.image.load("assets/mountain.png").convert_alpha()
+forest_tile = pygame.image.load("assets/forest.png").convert_alpha()  # New asset for forest
 soldier_img = pygame.image.load("assets/soldier.png").convert_alpha()
 robot_img = pygame.image.load("assets/robot.png").convert_alpha()
 
@@ -24,7 +25,8 @@ robot_img = pygame.image.load("assets/robot.png").convert_alpha()
 terrain_data = {
     "grass": {"movement_cost": 1, "cover": 0},
     "water": {"movement_cost": 3, "cover": 0},
-    "mountain": {"movement_cost": 2, "cover": 25}  # Example cover percentage
+    "mountain": {"movement_cost": 2, "cover": 25},
+    "forest": {"movement_cost": 2, "cover": 10}  # Example cover for forest
 }
 
 # Unit Class
@@ -122,7 +124,7 @@ while running:
     for y, row in enumerate(game_map):
         for x, tile in enumerate(row):
             if not fog_of_war[y][x]:  # Only reveal explored tiles
-                image = grass_tile if tile == "grass" else water_tile if tile == "water" else mountain_tile
+                image = grass_tile if tile == "grass" else water_tile if tile == "water" else mountain_tile if tile == "mountain" else forest_tile
                 screen.blit(image, (x * TILE_SIZE, y * TILE_SIZE))
 
     # Draw Units
