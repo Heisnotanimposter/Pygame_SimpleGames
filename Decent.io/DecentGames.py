@@ -54,15 +54,23 @@ class Unit(pygame.sprite.Sprite):
         self.attack_type = "melee" if type == "soldier" else "ranged"
 
     def move(self, dx, dy):
-        new_x, new_y = self.rect.x + dx * TILE_SIZE, self.rect.y + dy * TILE_SIZE
-        if 0 <= new_x < SCREEN_WIDTH and 0 <= new_y < SCREEN_HEIGHT:
-            tile_type = game_map[new_y // TILE_SIZE][new_x // TILE_SIZE]
+    new_x, new_y = self.rect.x + dx * TILE_SIZE, self.rect.y + dy * TILE_SIZE
+
+    # Boundary check for game_map
+    if 0 <= new_x < SCREEN_WIDTH and 0 <= new_y < SCREEN_HEIGHT:
+        row_index = new_y // TILE_SIZE
+        col_index = new_x // TILE_SIZE
+
+        # Additional boundary check for accessing game_map
+        if 0 <= row_index < len(game_map) and 0 <= col_index < len(game_map[0]): 
+            tile_type = game_map[row_index][col_index]
             if tile_type != "water":
                 movement_cost = terrain_data[tile_type]["movement_cost"]
                 if movement_cost <= self.action_points:
                     self.rect.x = new_x
                     self.rect.y = new_y
                     self.action_points -= movement_cost
+
 
     def attack(self, target):
         if self.attack_type == "melee" and self.rect.colliderect(target.rect):
@@ -102,7 +110,9 @@ def update_fog_of_war():
                 for dy in range(-unit.movement_range, unit.movement_range + 1):
                     new_x = (unit.rect.x // TILE_SIZE) + dx
                     new_y = (unit.rect.y // TILE_SIZE) + dy
-                    if 0 <= new_x < len(game_map[0]) and 0 <= new_y < len(game_map):
+
+                    # Boundary check for fog_of_war
+                    if 0 <= new_x < len(fog_of_war[0]) and 0 <= new_y < len(fog_of_war):
                         fog_of_war[new_y][new_x] = False
 
 # AI Move Logic
@@ -187,7 +197,31 @@ while running:
                             if unit.health <= 0:
                                 units.remove(unit)
                             selected_unit.action_points = 0
+                        elif event.type == pygame.MOUSEBUTTONDOWN and selected_unit:
+                            if event.button == 3:  # Right-click to end turn or move
+                                if selected_unit.action_points > 0:
+                                # Attempt to move the unit to the clicked tile
+                                    target_x, target_y = event.pos
+                                    dx = (target_x // TILE_SIZE) - (selected_unit.rect.x // TILE_SIZE)
+                                    dy = (target_y // TILE_SIZE) - (selected_unit.rect.y // TILE_SIZE)
+                                    selected_unit.move(dx, dy)
+                    else:
+                        switch_turn()
+
                         break
+        if event.type == pygame.KEYDOWN:
+            if selected_unit and selected_unit.player == turn:
+                if event.key == pygame.K_w:
+                    selected_unit.move(0, -1) 
+                elif event.key == pygame.K_s:
+                    selected_unit.move(0, 1)  
+                elif event.key == pygame.K_a:
+                    selected_unit.move(-1, 0) 
+                elif event.key == pygame.K_d:
+                    selected_unit.move(1, 0)   
+                elif event.key == pygame.K_SPACE:  # End turn with spacebar
+                    switch_turn()
+
             elif event.button == 3 and selected_unit:
                 if selected_unit.action_points > 0:
                     target_x, target_y = event.pos
